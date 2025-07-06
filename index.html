@@ -598,22 +598,33 @@ document.addEventListener('DOMContentLoaded', () => {
     async function callGeminiAPI(prompt, resultElement, loadingElement) {
         resultElement.classList.add('hidden');
         loadingElement.classList.remove('hidden');
-        resultElement.innerHTML = '';
+        resultElement.innerHTML = ''; // Clear previous results
 
         try {
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
             const payload = { contents: chatHistory };
-            const apiKey = "";
+            const apiKey = ""; // This should be provided by the Canvas environment
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             
+            console.log("Sending API request with prompt:", prompt);
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API response not OK:', response.status, response.statusText, errorText);
+                resultElement.innerHTML = `<p class="text-red-500">Error: API call failed with status ${response.status}. Please check console for details.</p>`;
+                resultElement.classList.remove('hidden');
+                return;
+            }
+
             const result = await response.json();
+            console.log("Received API response:", result);
             
             if (result.candidates && result.candidates.length > 0 &&
                 result.candidates[0].content && result.candidates[0].content.parts &&
@@ -622,12 +633,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultElement.innerHTML = `<p>${text}</p>`;
                 resultElement.classList.remove('hidden');
             } else {
-                resultElement.innerHTML = '<p class="text-red-500">Could not generate insight. Please try again.</p>';
+                console.warn("API response structure unexpected or content missing:", result);
+                resultElement.innerHTML = '<p class="text-red-500">Could not generate insight. Unexpected API response structure. Please try again.</p>';
                 resultElement.classList.remove('hidden');
             }
         } catch (error) {
             console.error('Error calling Gemini API:', error);
-            resultElement.innerHTML = '<p class="text-red-500">An error occurred. Please try again later.</p>';
+            resultElement.innerHTML = '<p class="text-red-500">An error occurred during the API call (e.g., network error). Please check your internet connection and try again later.</p>';
             resultElement.classList.remove('hidden');
         } finally {
             loadingElement.classList.add('hidden');
