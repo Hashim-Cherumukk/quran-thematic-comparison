@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals (Stone, Amber, Muted Teal & Maroon) -->
     <!-- Application Structure Plan: The SPA is designed around a central theme of 'contrast' to mirror the report's core argument. The structure is non-linear, allowing users to explore via a sticky navigation bar. The default view is the 'Thematic Comparison,' which uses an interactive chart and comparative cards to immediately present the antithesis between the Surahs. This is more engaging than a traditional linear report. Subsequent sections, 'Surah Deep Dive' and 'Key Terms Explorer,' use tabs and interactive buttons to break down dense information into digestible, user-initiated segments. This architecture prioritizes user-driven exploration and understanding of the central contrast over passively reading the source material. -->
-    <!-- Visualization & Content Choices: 1. Thematic Contrast Chart (Goal: Compare) -> Grouped Bar Chart (Chart.js/Canvas) -> Interactive tooltips show the contrast between Al-Ma'un (negative values) and Al-Kauthar (positive values) on core themes like Generosity, Worship, and Legacy. This provides an instant visual summary of the report's thesis. 2. Al-Zarkashi's Analysis (Goal: Organize/Compare) -> Interactive Cards (HTML/CSS/JS) -> Presents the four key antithetical points in a grid. Clicking reveals details, making the scholarly analysis more engaging. 3. Surah Details (Goal: Inform/Organize) -> Tabs & Accordions (HTML/CSS/JS) -> Manages the large volume of textual data, allowing users to "drill down" into specific aspects like historical context or literary features without being overwhelmed. 4. Key Terms (Goal: Inform) -> Interactive Buttons/Display Area (HTML/CSS/JS) -> Replaces the static Table 2 with a dynamic glossary, improving usability. 5. ✨ Verse Insight Generator (Goal: Inform/Deepen Understanding) -> Text Input & Button with LLM Call -> Allows users to get AI-generated tafsir for specific verses. 6. ✨ Generate New Comparative Insight (Goal: Compare/Generate New Perspectives) -> Button with LLM Call -> Provides AI-generated concise comparative insights between the two Surahs. NO SVG/Mermaid is used, adhering to constraints. -->
+    <!-- Visualization & Content Choices: 1. Thematic Contrast Chart (Goal: Compare) -> Grouped Bar Chart (Chart.js/Canvas) -> Interactive tooltips show the contrast between Al-Ma'un (negative values) and Al-Kauthar (positive values) on core themes like Generosity, Worship, and Legacy. This provides an instant visual summary of the report's thesis. 2. Al-Zarkashi's Analysis (Goal: Organize/Compare) -> Interactive Cards (HTML/CSS/JS) -> Presents the four key antithetical points in a grid. Clicking reveals details, making the scholarly analysis more engaging. 3. Surah Details (Goal: Inform/Organize) -> Tabs & Accordions (HTML/CSS/JS) -> Manages the large volume of textual data, allowing users to "drill down" into specific aspects like historical context or literary features without being overwhelmed. 4. Key Terms (Goal: Inform) -> Interactive Buttons/Display Area (HTML/CSS/JS) -> Replaces the static Table 2 with a dynamic glossary, improving usability. 5. ✨ Verse Insight Generator (Goal: Inform/Deepen Understanding) -> Text Input & Button with LLM Call -> Allows users to get AI-generated tafsir for specific verses. 6. ✨ Generate New Comparative Insight (Goal: Compare/Generate New Perspectives) -> Button with LLM Call -> Provides AI-generated concise comparative insights between the two Surahs. 7. ✨ Generate Reflection (Goal: Reflect/Synthesize) -> Button with LLM Call -> Provides AI-generated spiritual reflections on the combined themes. 8. ✨ Ask a Question (Goal: Q&A/Explore) -> Text Input & Button with LLM Call -> Allows users to ask general questions about the Surahs. NO SVG/Mermaid is used, adhering to constraints. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -117,12 +117,14 @@
                 <a href="#comparison" class="nav-link active">Thematic Comparison</a>
                 <a href="#deep-dive" class="nav-link">Surah Deep Dive</a>
                 <a href="#terms" class="nav-link">Key Terms</a>
+                <a href="#qna" class="nav-link">Interactive Q&A</a>
             </div>
             <div class="md:hidden">
                 <select id="mobile-nav" class="bg-white border border-stone-300 rounded-md p-2">
                     <option value="#comparison">Thematic Comparison</option>
                     <option value="#deep-dive">Surah Deep Dive</option>
                     <option value="#terms">Key Terms</option>
+                    <option value="#qna">Interactive Q&A</option>
                 </select>
             </div>
         </nav>
@@ -167,10 +169,13 @@
                     <p class="text-stone-600">Al-Ma'un's subject refuses even the smallest aid. In stark contrast, Al-Kauthar commands sacrifice ("Nahr"), which involves the charitable distribution of meat, representing a significant act of generosity and social good.</p>
                 </div>
             </div>
-            <div class="text-center mt-12">
+            <div class="text-center mt-12 flex flex-wrap justify-center gap-4">
                 <button id="generateComparativeInsightBtn" class="llm-button">✨ Generate New Comparative Insight</button>
-                <div id="comparativeInsightResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden"></div>
+                <button id="generateReflectionBtn" class="llm-button">✨ Generate Reflection</button>
+                <div id="comparativeInsightResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden w-full max-w-2xl"></div>
                 <div id="comparativeInsightLoading" class="loading-spinner hidden mt-4"></div>
+                <div id="reflectionResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden w-full max-w-2xl"></div>
+                <div id="reflectionLoading" class="loading-spinner hidden mt-4"></div>
             </div>
         </section>
 
@@ -205,6 +210,26 @@
                 <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold" data-term="riya">Riya'</button>
             </div>
             <div id="term-display" class="bg-white p-8 rounded-xl shadow-lg min-h-[200px] transition-all duration-300">
+            </div>
+        </section>
+
+        <section id="qna" class="my-12 md:my-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-4xl font-bold">Interactive Q&A ✨</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-stone-600">
+                    Ask any question about Surah Al-Ma'un or Surah Al-Kauthar, and get an AI-generated response.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                <div class="mb-4">
+                    <label for="qnaInput" class="block text-stone-700 text-lg font-semibold mb-2">Your Question:</label>
+                    <input type="text" id="qnaInput" placeholder="e.g., What is the main message of Surah Al-Ma'un?" class="w-full p-3 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="text-center mb-4">
+                    <button id="askQuestionBtn" class="llm-button">Ask Question</button>
+                </div>
+                <div id="qnaResult" class="text-stone-700 mt-4 p-4 bg-stone-50 rounded-md border border-stone-200 hidden"></div>
+                <div id="qnaLoading" class="loading-spinner hidden mx-auto mt-4"></div>
             </div>
         </section>
 
@@ -471,6 +496,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const comparativeInsightResult = document.getElementById('comparativeInsightResult');
     const comparativeInsightLoading = document.getElementById('comparativeInsightLoading');
 
+    const generateReflectionBtn = document.getElementById('generateReflectionBtn');
+    const reflectionResult = document.getElementById('reflectionResult');
+    const reflectionLoading = document.getElementById('reflectionLoading');
+
     const getMaunVerseInsightBtn = document.getElementById('getMaunVerseInsightBtn');
     const maunVerseInput = document.getElementById('maunVerseInput');
     const maunVerseInsightResult = document.getElementById('maunVerseInsightResult');
@@ -480,6 +509,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const kautharVerseInput = document.getElementById('kautharVerseInput');
     const kautharVerseInsightResult = document.getElementById('kautharVerseInsightResult');
     const kautharVerseInsightLoading = document.getElementById('kautharVerseInsightLoading');
+
+    const qnaInput = document.getElementById('qnaInput');
+    const askQuestionBtn = document.getElementById('askQuestionBtn');
+    const qnaResult = document.getElementById('qnaResult');
+    const qnaLoading = document.getElementById('qnaLoading');
 
     async function callGeminiAPI(prompt, resultElement, loadingElement) {
         resultElement.classList.add('hidden');
@@ -525,6 +559,11 @@ document.addEventListener('DOMContentLoaded', () => {
         callGeminiAPI(prompt, comparativeInsightResult, comparativeInsightLoading);
     });
 
+    generateReflectionBtn.addEventListener('click', () => {
+        const prompt = "Generate a concise spiritual reflection or a key lesson (around 70-100 words) derived from the combined themes and contrast of Surah Al-Ma'un and Surah Al-Kauthar. Focus on practical takeaways for the reader.";
+        callGeminiAPI(prompt, reflectionResult, reflectionLoading);
+    });
+
     getMaunVerseInsightBtn.addEventListener('click', () => {
         const verseNum = maunVerseInput.value.trim();
         if (verseNum) {
@@ -544,6 +583,17 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             kautharVerseInsightResult.innerHTML = '<p class="text-red-500">Please enter a verse number for Surah Al-Kauthar.</p>';
             kautharVerseInsightResult.classList.remove('hidden');
+        }
+    });
+
+    askQuestionBtn.addEventListener('click', () => {
+        const question = qnaInput.value.trim();
+        if (question) {
+            const prompt = `Answer the following question about Surah Al-Ma'un or Surah Al-Kauthar concisely, based on Islamic scholarship: "${question}"`;
+            callGeminiAPI(prompt, qnaResult, qnaLoading);
+        } else {
+            qnaResult.innerHTML = '<p class="text-red-500">Please enter a question.</p>';
+            qnaResult.classList.remove('hidden');
         }
     });
 });
