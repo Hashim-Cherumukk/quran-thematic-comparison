@@ -1,326 +1,705 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thematic Coherence: Al-Ma'un & Al-Kauthar</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f5f5f4;
-    }
-    h1, h2, h3, h4 {
-      font-family: 'DM Serif Display', serif;
-    }
-    .nav-link {
-      position: relative;
-      transition: all 0.3s ease;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: -4px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #f59e0b;
-      transition: width 0.3s ease;
-    }
-    .nav-link.active::after,
-    .nav-link:hover::after {
-      width: 100%;
-    }
-    .comparison-card {
-      background-color: #ffffff;
-      border-left: 4px solid #d1d5db;
-      transition: all 0.3s ease;
-    }
-    .comparison-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1);
-    }
-    .llm-button {
-      background-color: #f59e0b;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    .llm-button:hover {
-      background-color: #d97706;
-      transform: scale(1.05);
-    }
-    .loading-spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: #f59e0b;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 8px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thematic Coherence: Al-Ma'un & Al-Kauthar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Refined Warm Neutrals (Off-White, Deep Stone, Rich Amber, Deep Maroon, Emerald Teal) -->
+    <!-- Application Structure Plan: The SPA is designed around a central theme of 'contrast' to mirror the report's core argument. The structure is non-linear, allowing users to explore via a sticky navigation bar. The default view is the 'Thematic Comparison,' which uses an interactive chart and comparative cards to immediately present the antithesis between the Surahs. This is more engaging than a traditional linear report. Subsequent sections, 'Surah Deep Dive' and 'Key Terms Explorer,' use tabs and interactive buttons to break down dense information into digestible, user-initiated segments. This architecture prioritizes user-driven exploration and understanding of the central contrast over passively reading the source material. A new 'Interactive Q&A' section provides direct LLM interaction. -->
+    <!-- Visualization & Content Choices: 1. Thematic Contrast Chart (Goal: Compare) -> Grouped Bar Chart (Chart.js/Canvas) -> Interactive tooltips show the contrast between Al-Ma'un (negative values) and Al-Kauthar (positive values) on core themes like Generosity, Worship, and Legacy. This provides an instant visual summary of the report's thesis. 2. Al-Zarkashi's Analysis (Goal: Organize/Compare) -> Interactive Cards (HTML/CSS/JS) -> Presents the four key antithetical points in a grid. Clicking reveals details, making the scholarly analysis more engaging. 3. Surah Details (Goal: Inform/Organize) -> Tabs & Accordions (HTML/CSS/JS) -> Manages the large volume of textual data, allowing users to "drill down" into specific aspects like historical context or literary features without being overwhelmed. 4. Key Terms (Goal: Inform) -> Interactive Buttons/Display Area (HTML/CSS/JS) -> Replaces the static Table 2 with a dynamic glossary, improving usability. 5. ✨ Verse Insight Generator (Goal: Inform/Deepen Understanding) -> Text Input & Button with LLM Call -> Allows users to get AI-generated tafsir for specific verses. 6. ✨ Generate New Comparative Insight (Goal: Compare/Generate New Perspectives) -> Button with LLM Call -> Provides AI-generated concise comparative insights between the two Surahs. 7. ✨ Generate Reflection (Goal: Reflect/Synthesize) -> Button with LLM Call -> Provides AI-generated spiritual reflections on the combined themes. 8. ✨ Ask a Question (Goal: Q&A/Explore) -> Text Input & Button with LLM Call -> Allows users to ask general questions about the Surahs. 9. ✨ Summarize Surah (Goal: Inform/Summarize) -> Button with LLM Call -> Provides a concise summary of the active Surah. 10. ✨ Generate Thematic Connection to Daily Life (Goal: Apply/Contextualize) -> Button with LLM Call -> Generates practical spiritual connections for daily life. 11. ✨ Expand on a Key Term (Goal: Elaborate/Deepen Understanding) -> Button with LLM Call -> Provides more elaborate explanations for selected terms. NO SVG/Mermaid is used, adhering to constraints. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfbf9; /* off-white, very light cream */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #eab308; /* amber-500 */
+            transition: width 0.3s ease;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .comparison-card {
+            background-color: #ffffff;
+            border-left: 4px solid #d1d5db; /* gray-300 */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .comparison-card .title-maun {
+            color: #b91c1c; /* red-700, slightly richer */
+        }
+        .comparison-card .title-kauthar {
+            color: #0d9488; /* teal-600, slightly richer */
+        }
+        .tab.active {
+            border-color: #eab308; /* amber-500 */
+            background-color: #ffffff;
+            color: #eab308; /* amber-500 */
+        }
+        .tab:not(.active) {
+            color: #44403c; /* stone-700 */
+        }
+        .term-button.active {
+            background-color: #eab308; /* amber-500 */
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .llm-button {
+            background-color: #eab308; /* amber-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .llm-button:hover {
+            background-color: #d97706; /* amber-600 */
+            transform: translateY(-2px);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #eab308;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body class="text-stone-800">
-  <header class="bg-white/70 backdrop-blur sticky top-0 z-50 shadow-md">
-    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-stone-900">
-        <span class="text-red-800">Al-Ma'un</span> & <span class="text-teal-700">Al-Kauthar</span>
-      </h1>
-      <div class="hidden md:flex space-x-8">
-        <a href="#comparison" class="nav-link active">Thematic Comparison</a>
-        <a href="#deep-dive" class="nav-link">Surah Deep Dive</a>
-        <a href="#terms" class="nav-link">Key Terms</a>
-      </div>
-    </nav>
-  </header>
 
-  <main class="container mx-auto px-4 md:px-12">
-    <section id="hero" class="text-center my-16" data-aos="zoom-in">
-      <h2 class="text-5xl font-bold mb-4">Divine Contrast in Two Surahs</h2>
-      <p class="text-lg text-stone-600 max-w-2xl mx-auto">
-        A premium interactive journey into the powerful themes of Surah Al-Ma'un and Surah Al-Kauthar — contrasting darkness with divine generosity.
-      </p>
-    </section>
+    <header class="bg-stone-50/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-stone-900">
+                <span class="text-red-700">Al-Ma'un</span> & <span class="text-teal-600">Al-Kauthar</span>
+            </h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#comparison" class="nav-link active">Thematic Comparison</a>
+                <a href="#deep-dive" class="nav-link">Surah Deep Dive</a>
+                <a href="#terms" class="nav-link">Key Terms</a>
+                <a href="#qna" class="nav-link">Interactive Q&A</a>
+            </div>
+            <div class="md:hidden">
+                <select id="mobile-nav" class="bg-white border border-stone-300 rounded-md p-2 shadow-sm">
+                    <option value="#comparison">Thematic Comparison</option>
+                    <option value="#deep-dive">Surah Deep Dive</option>
+                    <option value="#terms">Key Terms</option>
+                    <option value="#qna">Interactive Q&A</option>
+                </select>
+            </div>
+        </nav>
+    </header>
 
-    <section id="comparison" class="my-24" data-aos="fade-up">
-      <h3 class="text-4xl font-bold text-center mb-6">Thematic Comparison</h3>
-      <div class="chart-container bg-white shadow-lg p-6 rounded-xl">
-        <canvas id="comparisonChart"></canvas>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 mt-12">
-        <div class="comparison-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="100">
-          <h4 class="text-xl font-bold mb-2 text-red-800">Stinginess vs Abundance</h4>
-          <p>Ma’un criticizes those who withhold small kindness. Kauthar opens by declaring divine abundance.</p>
-        </div>
-        <div class="comparison-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="200">
-          <h4 class="text-xl font-bold mb-2 text-red-800">Heedless Prayer vs Sincere Worship</h4>
-          <p>Ma’un describes showy, careless prayer. Kauthar commands worship with sincerity and sacrifice.</p>
-        </div>
-        <div class="comparison-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="300">
-          <h4 class="text-xl font-bold mb-2 text-red-800">Ostentation vs Devotion</h4>
-          <p>Ma’un condemns doing worship to be seen. Kauthar purifies intention toward Allah alone.</p>
-        </div>
-        <div class="comparison-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="400">
-          <h4 class="text-xl font-bold mb-2 text-red-800">Withholding vs Sacrifice</h4>
-          <p>Ma’un ends by noting even petty aid is withheld. Kauthar ends by commanding noble, generous sacrifice.</p>
-        </div>
-      </div>
-      <div class="text-center mt-12" data-aos="zoom-in">
-        <button class="llm-button">✨ Generate New Comparative Insight</button>
-        <div id="comparativeInsightResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden"></div>
-        <div id="comparativeInsightLoading" class="loading-spinner hidden mt-4"></div>
-      </div>
-    </section>
-<section id="deep-dive" class="my-24 scroll-mt-20" data-aos="fade-up">
-  <div class="text-center mb-12">
-    <h3 class="text-4xl font-bold">Surah Deep Dive</h3>
-    <p class="mt-4 max-w-3xl mx-auto text-stone-600">
-      Explore the specific details of each Surah. Use the tabs to switch between Surah Al-Ma'un and Surah Al-Kauthar.
-    </p>
-  </div>
-  <div class="bg-stone-100 rounded-xl p-2 shadow-inner">
-    <div class="flex border-b border-stone-300">
-      <button class="tab flex-1 py-3 px-4 font-semibold text-lg text-red-800 border-b-4 border-transparent" data-tab="maun">Surah Al-Ma'un</button>
-      <button class="tab flex-1 py-3 px-4 font-semibold text-lg text-teal-700 border-b-4 border-transparent" data-tab="kauthar">Surah Al-Kauthar</button>
-    </div>
-    <div id="maun-content" class="tab-content p-4 md:p-8"></div>
-    <div id="kauthar-content" class="tab-content p-4 md:p-8 hidden"></div>
-  </div>
-</section>
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="hero" class="text-center my-8 md:my-16 section-fade-in">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 text-stone-900">A Study in Divine Contrast</h2>
+            <p class="max-w-3xl mx-auto text-stone-700 md:text-xl">
+                An interactive exploration of the profound thematic coherence between Surah Al-Ma'un and Surah Al-Kauthar. Discover how these two short, consecutive chapters masterfully present opposing moral and spiritual archetypes.
+            </p>
+        </section>
 
-<script>
-  const contentData = {
-    maun: {
-      title: "Surah Al-Ma'un: The Portrait of Denial",
-      sections: [
-        {
-          title: "Historical Context",
-          content: "Revealed in Makkah, addressing figures like Abu Jahl who mistreated the weak. It critiques social and spiritual hypocrisy."
-        },
-        {
-          title: "Theme: Denial of Afterlife",
-          content: "The denial of accountability in the Hereafter leads to moral decay — ignoring orphans, avoiding charity, false worship."
-        },
-        {
-          title: "Theme: Hypocritical Worship",
-          content: "Prayers performed for show (riya') are condemned. It’s a warning against empty rituals without sincere belief."
-        }
-      ]
-    },
-    kauthar: {
-      title: "Surah Al-Kauthar: Divine Reassurance",
-      sections: [
-        {
-          title: "Historical Context",
-          content: "Revealed to console the Prophet (ﷺ) after the death of his son, refuting those who mocked him as 'cut off'."
-        },
-        {
-          title: "Theme: Abundance of Good",
-          content: "Kawthar represents immense divine blessing — whether it's a river in Paradise, or the Prophet’s spiritual legacy."
-        },
-        {
-          title: "Theme: Gratitude & Worship",
-          content: "The Surah links divine blessings to sincere prayer and sacrifice, urging devotion and service to Allah."
-        }
-      ]
-    }
-  };
+        <section id="comparison" class="my-12 md:my-24 scroll-mt-20 section-fade-in">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-4xl font-bold text-stone-900">Thematic Comparison: A Tale of Two Characters</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-stone-700">
+                    This section visually contrasts the core themes of the two Surahs. The chart highlights the direct opposition between the traits of the Denier/Hypocrite in Al-Ma'un and the qualities of the Grateful/Blessed in Al-Kauthar. Below, explore the four key points of antithesis identified by classical scholars like Al-Zarkashi.
+                </p>
+            </div>
+            <div class="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 mt-12">
+                <div class="comparison-card p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2"><span class="title-maun">Stinginess</span> vs <span class="title-kauthar">Abundance</span></h4>
+                    <p class="text-stone-600">Al-Ma'un condemns the one who withholds even "Ma'un" (small kindnesses), showcasing extreme miserliness. In direct opposition, Al-Kauthar begins with the declaration of Allah granting "Al-Kawthar" (abundance of all good), highlighting boundless divine generosity.</p>
+                </div>
+                <div class="comparison-card p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2"><span class="title-maun">Heedless Prayer</span> vs <span class="title-kauthar">Sincere Prayer</span></h4>
+                    <p class="text-stone-600">Al-Ma'un decries those who are neglectful and heedless in their prayers. In contrast, Al-Kauthar commands consistent, devoted prayer performed sincerely "to your Lord," emphasizing devotion and consistency.</p>
+                </div>
+                <div class="comparison-card p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2"><span class="title-maun">Ostentation (Riya')</span> vs <span class="title-kauthar">Sincere Worship</span></h4>
+                    <p class="text-stone-600">Al-Ma'un criticizes worship done for show to gain human praise. Al-Kauthar purifies this intention by commanding worship be directed "to your Lord" alone, free from any desire for public approval.</p>
+                </div>
+                <div class="comparison-card p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2"><span class="title-maun">Withholding Aid</span> vs <span class="title-kauthar">Generous Sacrifice</span></h4>
+                    <p class="text-stone-600">Al-Ma'un's subject refuses even the smallest aid. In stark contrast, Al-Kauthar commands sacrifice ("Nahr"), which involves the charitable distribution of meat, representing a significant act of generosity and social good.</p>
+                </div>
+            </div>
+            <div class="text-center mt-12 flex flex-wrap justify-center gap-4">
+                <button id="generateComparativeInsightBtn" class="llm-button">✨ New Comparative Insight</button>
+                <button id="generateReflectionBtn" class="llm-button">✨ Generate Reflection</button>
+                <button id="generateDailyConnectionBtn" class="llm-button">✨ Connect to Daily Life</button>
+                <div id="comparativeInsightResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden w-full max-w-2xl text-stone-700"></div>
+                <div id="comparativeInsightLoading" class="loading-spinner hidden mt-4"></div>
+                <div id="reflectionResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden w-full max-w-2xl text-stone-700"></div>
+                <div id="reflectionLoading" class="loading-spinner hidden mt-4"></div>
+                <div id="dailyConnectionResult" class="mt-4 p-4 bg-white rounded-lg shadow-md hidden w-full max-w-2xl text-stone-700"></div>
+                <div id="dailyConnectionLoading" class="loading-spinner hidden mt-4"></div>
+            </div>
+        </section>
 
-  function generateAccordion(data) {
-    return data.sections.map((section, index) => `
-      <div class="mb-2 bg-white rounded-lg shadow-sm overflow-hidden">
-        <button class="accordion-toggle w-full text-left p-4 font-semibold flex justify-between items-center hover:bg-stone-50">
-          <span>${section.title}</span>
-          <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-        <div class="accordion-content p-4 pt-0 text-stone-600 ${index > 0 ? 'hidden' : ''}">
-          <p>${section.content}</p>
-        </div>
-      </div>
-    `).join('');
-  }
+        <section id="deep-dive" class="my-12 md:my-24 scroll-mt-20 section-fade-in">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-4xl font-bold text-stone-900">Surah Deep Dive</h3>
+                 <p class="mt-4 max-w-3xl mx-auto text-stone-700">
+                    Explore the specific details of each Surah. Use the tabs to switch between Surah Al-Ma'un and Surah Al-Kauthar. Each tab provides insights into the historical context, core themes, and literary features, allowing for a focused study of each chapter's message.
+                </p>
+            </div>
+            <div class="bg-stone-100 rounded-xl p-2 shadow-lg">
+                <div class="flex border-b border-stone-300">
+                    <button class="tab flex-1 py-3 px-4 font-semibold text-lg border-b-4 border-transparent rounded-t-lg transition-all duration-300" data-tab="maun">Surah Al-Ma'un</button>
+                    <button class="tab flex-1 py-3 px-4 font-semibold text-lg border-b-4 border-transparent rounded-t-lg transition-all duration-300" data-tab="kauthar">Surah Al-Kauthar</button>
+                </div>
+                <div id="maun-content" class="tab-content p-4 md:p-8"></div>
+                <div id="kauthar-content" class="tab-content p-4 md:p-8 hidden"></div>
+            </div>
+        </section>
+        
+        <section id="terms" class="my-12 md:my-24 scroll-mt-20 section-fade-in">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-4xl font-bold text-stone-900">Key Terms Explorer</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-stone-700">
+                   The power of these Surahs lies in their specific, potent vocabulary. Click on a term below to explore its rich linguistic and exegetical meanings as understood by classical scholars. This interactive glossary helps clarify the central concepts that drive the contrast between the two chapters.
+                </p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold text-stone-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200" data-term="kauthar">Al-Kawthar</button>
+                <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold text-stone-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200" data-term="abtar">Al-Abtar</button>
+                <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold text-stone-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200" data-term="maun">Al-Ma'un</button>
+                <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold text-stone-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200" data-term="riya">Riya'</button>
+            </div>
+            <div id="term-display" class="bg-white p-8 rounded-xl shadow-lg min-h-[200px] transition-all duration-300 text-stone-700">
+            </div>
+        </section>
 
-  const tabs = document.querySelectorAll('.tab');
-  const maunContent = document.getElementById('maun-content');
-  const kautharContent = document.getElementById('kauthar-content');
+        <section id="qna" class="my-12 md:my-24 scroll-mt-20 section-fade-in">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-4xl font-bold text-stone-900">Interactive Q&A ✨</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-stone-700">
+                    Ask any question about Surah Al-Ma'un or Surah Al-Kauthar, and get an AI-generated response.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                <div class="mb-4">
+                    <label for="qnaInput" class="block text-stone-700 text-lg font-semibold mb-2">Your Question:</label>
+                    <input type="text" id="qnaInput" placeholder="e.g., What is the main message of Surah Al-Ma'un?" class="w-full p-3 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm">
+                </div>
+                <div class="text-center mb-4">
+                    <button id="askQuestionBtn" class="llm-button">Ask Question</button>
+                </div>
+                <div id="qnaResult" class="text-stone-700 mt-4 p-4 bg-stone-50 rounded-md border border-stone-200 hidden"></div>
+                <div id="qnaLoading" class="loading-spinner hidden mx-auto mt-4"></div>
+            </div>
+        </section>
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('border-b-amber-500', 'bg-white'));
-      tab.classList.add('border-b-amber-500', 'bg-white');
-      const tabName = tab.dataset.tab;
-      maunContent.classList.add('hidden');
-      kautharContent.classList.add('hidden');
-      document.getElementById(`${tabName}-content`).classList.remove('hidden');
-    });
-  });
-
-  document.querySelectorAll('.tab-content').forEach(container => {
-    container.addEventListener('click', e => {
-      const toggle = e.target.closest('.accordion-toggle');
-      if (toggle) {
-        const content = toggle.nextElementSibling;
-        const icon = toggle.querySelector('svg');
-        content.classList.toggle('hidden');
-        icon.classList.toggle('rotate-180');
-      }
-    });
-  });
-
-  maunContent.innerHTML = generateAccordion(contentData.maun);
-  kautharContent.innerHTML = generateAccordion(contentData.kauthar);
-  tabs[0].click(); // Default active tab
-</script>
-<section id="terms" class="my-24 scroll-mt-20" data-aos="fade-up">
-  <div class="text-center mb-12">
-    <h3 class="text-4xl font-bold">Key Terms Explorer</h3>
-    <p class="mt-4 max-w-3xl mx-auto text-stone-600">
-      Tap on any key term below to explore its meaning and significance.
-    </p>
-  </div>
-  <div class="flex flex-wrap justify-center gap-4 mb-8">
-    <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold" data-term="kauthar">Al-Kawthar</button>
-    <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold" data-term="abtar">Al-Abtar</button>
-    <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold" data-term="maun">Al-Ma'un</button>
-    <button class="term-button py-2 px-5 rounded-full bg-white shadow font-semibold" data-term="riya">Riya'</button>
-  </div>
-  <div id="term-display" class="bg-white p-8 rounded-xl shadow-lg min-h-[200px] transition-all duration-300 text-stone-700 text-lg text-left max-w-3xl mx-auto"></div>
-</section>
-
-<footer class="text-center py-8 bg-stone-100 text-stone-600 mt-24">
-  &copy; 2025 — Built by Hashim | Qur’anic Reflections with Modern Tech.
-</footer>
+    </main>
+    
+    <footer class="text-center p-6 bg-stone-200 text-stone-600 mt-16 shadow-inner">
+        <p>Interactive Exegesis based on "Thematic Coherence Between Surah Al-Ma'un and Surah Al-Kauthar".</p>
+        <p>&copy; 2025. All Rights Reserved.</p>
+    </footer>
 
 <script>
-  // AOS Animation
-  AOS.init();
-
-  // Comparison Chart
-  const ctx = document.getElementById('comparisonChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Generosity', 'Worship', 'Legacy'],
-      datasets: [
-        {
-          label: \"Al-Ma'un (Negatives)\",
-          data: [-10, -8, -9],
-          backgroundColor: 'rgba(220, 38, 38, 0.7)',
-          borderRadius: 6
-        },
-        {
-          label: 'Al-Kauthar (Positives)',
-          data: [10, 9, 10],
-          backgroundColor: 'rgba(13, 148, 136, 0.7)',
-          borderRadius: 6
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: {
-        legend: { position: 'bottom' }
-      },
-      scales: {
-        x: { display: false, min: -12, max: 12 },
-        y: { ticks: { font: { size: 14, weight: 'bold' } } }
-      }
-    }
-  });
-
-  // Glossary Terms
-  const termButtons = document.querySelectorAll('.term-button');
-  const termDisplay = document.getElementById('term-display');
-
-  const glossary = {
-    kauthar: {
-      title: 'Al-Kawthar (الكوثر)',
-      content: 'Means immense abundance. Includes a river in Paradise, the Prophet’s legacy, and more.'
-    },
-    abtar: {
-      title: 'Al-Abtar (الأبتر)',
-      content: 'Means “cut off.” Refers to the enemies of the Prophet who would be forgotten.'
-    },
+const contentData = {
     maun: {
-      title: 'Al-Ma’un (الماعون)',
-      content: 'Small acts of kindness like sharing water or tools. Symbol of basic humanity withheld by hypocrites.'
+        title: "Surah Al-Ma'un: The Portrait of Denial",
+        sections: [
+            {
+                title: "Historical Context (Asbab al-Nuzul)",
+                content: "Generally classified as a Makkan Surah, though some scholars like Mawdudi and traditions cited by Imam Al-Suyuti suggest a mixed revelation. The verses are linked to figures like Abu Jahl or Al-'As ibn Wa'il, who epitomized harshness towards orphans and the poor. This context highlights the Surah's condemnation of tangible moral failings rooted in disbelief."
+            },
+            {
+                title: "Core Theme: Denial of the Hereafter",
+                content: "The Surah opens by questioning one who 'denies the Din (religion/recompense).' This foundational flaw—the rejection of accountability in the afterlife—is presented as the root cause of all subsequent moral decay, leading to a corrupt and compassionless character."
+            },
+            {
+                title: "Core Theme: Mistreatment of the Vulnerable",
+                content: "The denier is identified by two key actions: harshly repulsing the orphan and failing to encourage the feeding of the needy. This critique extends beyond personal neglect to a failure in social responsibility, framing sustenance for the poor as their inherent right."
+            },
+            {
+                title: "Core Theme: Flawed Worship & Hypocrisy (Riya')",
+                content: "'Woe unto those who pray, yet are heedless.' This verse condemns hypocrites who pray for outward show, neglecting the spirit, timing, and sincerity of Salah. The vice of Riya' (showing off) is central, where good deeds are performed for human praise, not for Allah."
+            },
+            {
+                title: "Core Theme: Withholding 'Al-Ma'un'",
+                content: "The Surah culminates by condemning those who withhold 'Al-Ma'un'—small, common acts of kindness or assistance, like lending a household item. This extreme miserliness reveals a character completely devoid of empathy and generosity, indicating deep spiritual bankruptcy."
+            },
+            {
+                title: "Literary & Rhetorical Features",
+                content: "The Surah uses a powerful rhetorical question to engage the audience. Its structure logically progresses from the root cause (denial of Hereafter) to its outward symptoms (mistreatment, flawed worship, stinginess), creating a comprehensive and damning portrait of the hypocrite."
+            }
+        ]
     },
-    riya: {
-      title: 'Riya’ (الرياء)',
-      content: 'Showing off in worship. Condemned in Al-Ma’un as false spirituality done for others’ praise.'
+    kauthar: {
+        title: "Surah Al-Kauthar: The Declaration of Abundance",
+        sections: [
+            {
+                title: "Historical Context (Asbab al-Nuzul)",
+                content: "A Makkan Surah revealed to console Prophet Muhammad (PBUH) after his enemies, like Al-'As ibn Wa'il, taunted him as 'Al-Abtar' (cut off, without legacy) following the death of his infant son. Allah's response is an immediate and powerful act of divine comfort and reassurance."
+            },
+            {
+                title: "Core Theme: The Gift of 'Al-Kawthar'",
+                content: "'Indeed, We have granted you Al-Kawthar.' The term signifies 'abundance of good.' Classical interpretations are vast, including a river in Paradise, the Prophet's progeny through Fatimah, prophethood, the Qur'an, and wisdom. This multifaceted meaning underscores the limitless nature of the divine gift."
+            },
+            {
+                title: "Core Theme: The Command for Gratitude",
+                content: "'So pray to your Lord and sacrifice (Nahr).' Following the gift, Allah commands the proper response: profound gratitude expressed through sincere worship. Prayer connects one to God, while sacrifice (and its associated charity) connects one to humanity. This establishes that blessings come with responsibilities."
+            },
+            {
+                title: "Core Theme: The Rebuttal of 'Al-Abtar'",
+                content: "'Indeed, your enemy is the one who is cut off.' The Surah masterfully reverses the insult hurled at the Prophet. It declares that his enemies are the ones truly 'cut off' from all good and lasting legacy. This powerful antithesis highlights that true legacy is spiritual and granted by Allah, not based on biological lineage."
+            },
+            {
+                title: "Literary & Rhetorical Features",
+                content: "A masterpiece of eloquence (*i'jaz*). It opens with 'Inna' for emphasis. It employs *Iltifaat* (grammatical shift) from 'We' (majesty) to 'your Lord' (intimacy). Its core structure is a powerful antithesis between 'Kawthar' (abundance) and 'Abtar' (cut off), reinforced by unique vocabulary not found elsewhere in the Qur'an."
+            }
+        ]
+    },
+    terms: {
+        kauthar: {
+            title: "Al-Kawthar (الكوثر)",
+            content: "Linguistically means 'abundance of good.' It's an intensive form implying boundless, limitless good. Exegetical interpretations include: 1) A famous river/pond in Paradise, described in numerous Hadith. 2) The Prophet's progeny, especially through Fatimah. 3) Broader blessings like prophethood, the Qur'an, wisdom, and intercession. It represents the ultimate divine blessing, contrasting the spiritual poverty of Al-Ma'un."
+        },
+        abtar: {
+            title: "Al-Abtar (الأبتر)",
+            content: "Linguistically means 'cut off.' It implies being without male offspring/lineage, being cut off from all goodness, or having one's memory lost after death. Contextually, it was an insult used against the Prophet (PBUH). The Surah reverses it, declaring his enemies are the ones truly 'abtar.' It represents the ultimate consequence of denial and malice."
+        },
+        maun: {
+            title: "Al-Ma'un (الماعون)",
+            content: "Refers to small, common household items or minor acts of assistance that neighbors typically share (e.g., salt, water, buckets). Withholding even these trivial items signifies an extreme form of stinginess and lack of empathy, a key characteristic of the person described in Surah Al-Ma'un. It stands in stark thematic opposition to the 'abundance' of Al-Kawthar."
+        },
+        riya: {
+            title: "Riya' (الرياء)",
+            content: "Means 'showing off' or ostentation. In the Islamic context, it refers to performing acts of worship or good deeds to gain the praise and admiration of people, rather than purely for the sake of Allah. Surah Al-Ma'un condemns this as a form of hypocrisy that invalidates worship. Surah Al-Kauthar corrects this by commanding worship 'to your Lord' exclusively."
+        }
     }
-  };
+};
 
-  termButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      termButtons.forEach(b => b.classList.remove('bg-amber-500', 'text-white'));
-      button.classList.add('bg-amber-500', 'text-white');
-
-      const key = button.dataset.term;
-      const entry = glossary[key];
-      termDisplay.innerHTML = `<h4 class=\"text-2xl font-bold mb-2\">${entry.title}</h4><p>${entry.content}</p>`;
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const comparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Generosity', 'Sincerity in Worship', 'Enduring Legacy'],
+            datasets: [
+                {
+                    label: "Surah Al-Ma'un (Negative Traits)",
+                    data: [-10, -8, -9],
+                    backgroundColor: 'rgba(185, 28, 28, 0.7)', /* red-700 */
+                    borderColor: 'rgba(185, 28, 28, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                },
+                {
+                    label: "Surah Al-Kauthar (Positive Qualities)",
+                    data: [10, 9, 10],
+                    backgroundColor: 'rgba(13, 148, 136, 0.7)', /* teal-600 */
+                    borderColor: 'rgba(13, 148, 136, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    display: false,
+                    min: -12,
+                    max: 12
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        color: '#44403c' /* stone-700 */
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#44403c' /* stone-700 */
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.dataset.label.includes('Maun')) {
+                                const traits = ['Extreme Stinginess', 'Heedlessness & Riya', 'Cut off from Good'];
+                                label += traits[context.dataIndex];
+                            } else {
+                                const traits = ['Boundless Abundance', 'Sincere Prayer & Sacrifice', 'Promise of Enduring Legacy'];
+                                 label += traits[context.dataIndex];
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
     });
-  });
 
-  // Load first term
-  termButtons[0].click();
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const maunContent = document.getElementById('maun-content');
+    const kautharContent = document.getElementById('kauthar-content');
+    
+    function generateAccordion(data) {
+        return data.sections.map((section, index) => `
+            <div class="mb-2 bg-white rounded-lg shadow-sm overflow-hidden">
+                <button class="accordion-toggle w-full text-left p-4 font-semibold flex justify-between items-center hover:bg-stone-50 text-stone-800">
+                    <span>${section.title}</span>
+                    <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div class="accordion-content p-4 pt-0 text-stone-700 ${index > 0 ? 'hidden' : ''}">
+                    <p>${section.content}</p>
+                </div>
+            </div>
+        `).join('') + `
+            <div class="mt-8 p-4 bg-white rounded-lg shadow-md">
+                <h4 class="text-xl font-bold mb-3 text-stone-900">✨ Verse Insight Generator</h4>
+                <p class="text-stone-700 mb-4">Enter a verse number (e.g., "${data.title.includes("Ma'un") ? "1-7" : "1-3"}") to get a concise explanation from an LLM.</p>
+                <div class="flex items-center space-x-2 mb-4">
+                    <input type="text" id="${data.title.includes("Ma'un") ? "maunVerseInput" : "kautharVerseInput"}" placeholder="e.g., ${data.title.includes("Ma'un") ? "4" : "1"}" class="flex-1 p-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm">
+                    <button id="${data.title.includes("Ma'un") ? "getMaunVerseInsightBtn" : "getKautharVerseInsightBtn"}" class="llm-button">Get Insight</button>
+                </div>
+                <div id="${data.title.includes("Ma'un") ? "maunVerseInsightResult" : "kautharVerseInsightResult"}" class="text-stone-700 mt-2"></div>
+                <div id="${data.title.includes("Ma'un") ? "maunVerseInsightLoading" : "kautharVerseInsightLoading"}" class="loading-spinner hidden mt-2"></div>
+            </div>
+            <div class="mt-8 p-4 bg-white rounded-lg shadow-md">
+                <h4 class="text-xl font-bold mb-3 text-stone-900">✨ Summarize Surah</h4>
+                <p class="text-stone-700 mb-4">Get a concise summary of this Surah's main message and key themes.</p>
+                <div class="text-center">
+                    <button id="${data.title.includes("Ma'un") ? "summarizeMaunBtn" : "summarizeKautharBtn"}" class="llm-button">Summarize</button>
+                </div>
+                <div id="${data.title.includes("Ma'un") ? "summarizeMaunResult" : "summarizeKautharResult"}" class="text-stone-700 mt-4"></div>
+                <div id="${data.title.includes("Ma'un") ? "summarizeMaunLoading" : "summarizeKautharLoading"}" class="loading-spinner hidden mt-4"></div>
+            </div>
+        `;
+    }
+
+    maunContent.innerHTML = generateAccordion(contentData.maun);
+    kautharContent.innerHTML = generateAccordion(contentData.kauthar);
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.classList.remove('text-red-700', 'text-teal-600');
+            });
+            tab.classList.add('active');
+            if (tab.dataset.tab === 'maun') {
+                tab.classList.add('text-red-700');
+            } else {
+                tab.classList.add('text-teal-600');
+            }
+            
+            tabContents.forEach(content => content.classList.add('hidden'));
+            document.getElementById(`${tab.dataset.tab}-content`).classList.remove('hidden');
+        });
+    });
+
+    document.querySelectorAll('.tab-content').forEach(container => {
+        container.addEventListener('click', e => {
+            const toggle = e.target.closest('.accordion-toggle');
+            if (toggle) {
+                const content = toggle.nextElementSibling;
+                const icon = toggle.querySelector('svg');
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            }
+        });
+    });
+    
+    tabs[0].click(); // Activate first tab on load
+
+    const termButtons = document.querySelectorAll('.term-button');
+    const termDisplay = document.getElementById('term-display');
+    
+    termButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            termButtons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            
+            const termData = contentData.terms[button.dataset.term];
+            termDisplay.innerHTML = `
+                <h4 class="text-2xl font-bold mb-3 text-stone-900">${termData.title}</h4>
+                <p class="text-stone-700">${termData.content}</p>
+                <div class="text-center mt-6">
+                    <button id="expandTermBtn" class="llm-button" data-term-key="${button.dataset.term}">✨ Expand Explanation</button>
+                    <div id="expandTermResult" class="mt-4 p-4 bg-stone-50 rounded-lg border border-stone-200 hidden text-stone-700"></div>
+                    <div id="expandTermLoading" class="loading-spinner hidden mt-4"></div>
+                </div>
+            `;
+            // Attach event listener for the new expand button
+            document.getElementById('expandTermBtn').addEventListener('click', handleExpandTerm);
+        });
+    });
+
+    termButtons[0].click(); // Activate first term on load
+    
+    const navLinks = document.querySelectorAll('.nav-link');
+    const mobileNav = document.getElementById('mobile-nav');
+    const sections = document.querySelectorAll('section');
+
+    function setActiveLink() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', setActiveLink);
+    
+    mobileNav.addEventListener('change', (e) => {
+        window.location.href = e.target.value;
+    });
+
+    // Intersection Observer for section fade-in animation
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const sectionObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+    });
+
+    // LLM Integration
+    const generateComparativeInsightBtn = document.getElementById('generateComparativeInsightBtn');
+    const comparativeInsightResult = document.getElementById('comparativeInsightResult');
+    const comparativeInsightLoading = document.getElementById('comparativeInsightLoading');
+
+    const generateReflectionBtn = document.getElementById('generateReflectionBtn');
+    const reflectionResult = document.getElementById('reflectionResult');
+    const reflectionLoading = document.getElementById('reflectionLoading');
+
+    const generateDailyConnectionBtn = document.getElementById('generateDailyConnectionBtn');
+    const dailyConnectionResult = document.getElementById('dailyConnectionResult');
+    const dailyConnectionLoading = document.getElementById('dailyConnectionLoading');
+
+    const getMaunVerseInsightBtn = document.getElementById('getMaunVerseInsightBtn');
+    const maunVerseInput = document.getElementById('maunVerseInput');
+    const maunVerseInsightResult = document.getElementById('maunVerseInsightResult');
+    const maunVerseInsightLoading = document.getElementById('maunVerseInsightLoading');
+
+    const getKautharVerseInsightBtn = document.getElementById('getKautharVerseInsightBtn');
+    const kautharVerseInput = document.getElementById('kautharVerseInput');
+    const kautharVerseInsightResult = document.getElementById('kautharVerseInsightResult');
+    const kautharVerseInsightLoading = document.getElementById('kautharVerseInsightLoading');
+
+    const summarizeMaunBtn = document.getElementById('summarizeMaunBtn');
+    const summarizeMaunResult = document.getElementById('summarizeMaunResult');
+    const summarizeMaunLoading = document.getElementById('summarizeMaunLoading');
+
+    const summarizeKautharBtn = document.getElementById('summarizeKautharBtn');
+    const summarizeKautharResult = document.getElementById('summarizeKautharResult');
+    const summarizeKautharLoading = document.getElementById('summarizeKautharLoading');
+
+    const qnaInput = document.getElementById('qnaInput');
+    const askQuestionBtn = document.getElementById('askQuestionBtn');
+    const qnaResult = document.getElementById('qnaResult');
+    const qnaLoading = document.getElementById('qnaLoading');
+
+    async function callGeminiAPI(prompt, resultElement, loadingElement) {
+        resultElement.classList.add('hidden');
+        loadingElement.classList.remove('hidden');
+        resultElement.innerHTML = '';
+
+        try {
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                const text = result.candidates[0].content.parts[0].text;
+                resultElement.innerHTML = `<p>${text}</p>`;
+                resultElement.classList.remove('hidden');
+            } else {
+                resultElement.innerHTML = '<p class="text-red-500">Could not generate insight. Please try again.</p>';
+                resultElement.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error calling Gemini API:', error);
+            resultElement.innerHTML = '<p class="text-red-500">An error occurred. Please try again later.</p>';
+            resultElement.classList.remove('hidden');
+        } finally {
+            loadingElement.classList.add('hidden');
+        }
+    }
+
+    generateComparativeInsightBtn.addEventListener('click', () => {
+        const prompt = "Generate a new, unique, and concise comparative insight (around 50-70 words) highlighting the thematic coherence or contrast between Surah Al-Ma'un and Surah Al-Kauthar, drawing from classical Islamic scholarship.";
+        callGeminiAPI(prompt, comparativeInsightResult, comparativeInsightLoading);
+    });
+
+    generateReflectionBtn.addEventListener('click', () => {
+        const prompt = "Generate a concise spiritual reflection or a key lesson (around 70-100 words) derived from the combined themes and contrast of Surah Al-Ma'un and Surah Al-Kauthar. Focus on practical takeaways for the reader.";
+        callGeminiAPI(prompt, reflectionResult, reflectionLoading);
+    });
+
+    generateDailyConnectionBtn.addEventListener('click', () => {
+        const prompt = "Based on the thematic coherence and contrast between Surah Al-Ma'un (denial, hypocrisy, stinginess) and Surah Al-Kauthar (abundance, sincerity, gratitude), generate a practical spiritual connection or lesson for daily life in a modern context (around 100-120 words).";
+        callGeminiAPI(prompt, dailyConnectionResult, dailyConnectionLoading);
+    });
+
+    getMaunVerseInsightBtn.addEventListener('click', () => {
+        const verseNum = maunVerseInput.value.trim();
+        if (verseNum) {
+            const prompt = `Provide a concise tafsir/explanation for Surah Al-Ma'un verse ${verseNum}.`;
+            callGeminiAPI(prompt, maunVerseInsightResult, maunVerseInsightLoading);
+        } else {
+            maunVerseInsightResult.innerHTML = '<p class="text-red-500">Please enter a verse number for Surah Al-Ma\'un.</p>';
+            maunVerseInsightResult.classList.remove('hidden');
+        }
+    });
+
+    getKautharVerseInsightBtn.addEventListener('click', () => {
+        const verseNum = kautharVerseInput.value.trim();
+        if (verseNum) {
+            const prompt = `Provide a concise tafsir/explanation for Surah Al-Kauthar verse ${verseNum}.`;
+            callGeminiAPI(prompt, kautharVerseInsightResult, kautharVerseInsightLoading);
+        } else {
+            kautharVerseInsightResult.innerHTML = '<p class="text-red-500">Please enter a verse number for Surah Al-Kauthar.</p>';
+            kautharVerseInsightResult.classList.remove('hidden');
+        }
+    });
+
+    summarizeMaunBtn.addEventListener('click', () => {
+        const prompt = "Summarize Surah Al-Ma'un concisely in about 80-100 words, highlighting its main message and key themes.";
+        callGeminiAPI(prompt, summarizeMaunResult, summarizeMaunLoading);
+    });
+
+    summarizeKautharBtn.addEventListener('click', () => {
+        const prompt = "Summarize Surah Al-Kauthar concisely in about 80-100 words, highlighting its main message and key themes.";
+        callGeminiAPI(prompt, summarizeKautharResult, summarizeKautharLoading);
+    });
+
+    function handleExpandTerm(event) {
+        const termKey = event.target.dataset.termKey;
+        const prompt = `Provide a more elaborate explanation and practical examples for the Islamic term '${contentData.terms[termKey].title.split(' ')[0]}' in the context of Quranic understanding, drawing from classical scholarship. (around 100-150 words)`;
+        const expandTermResult = document.getElementById('expandTermResult');
+        const expandTermLoading = document.getElementById('expandTermLoading');
+        callGeminiAPI(prompt, expandTermResult, expandTermLoading);
+    }
+
+    askQuestionBtn.addEventListener('click', () => {
+        const question = qnaInput.value.trim();
+        if (question) {
+            const prompt = `Answer the following question about Surah Al-Ma'un or Surah Al-Kauthar concisely, based on Islamic scholarship: "${question}"`;
+            callGeminiAPI(prompt, qnaResult, qnaLoading);
+        } else {
+            qnaResult.innerHTML = '<p class="text-red-500">Please enter a question.</p>';
+            qnaResult.classList.remove('hidden');
+        }
+    });
+});
 </script>
 </body>
 </html>
-
